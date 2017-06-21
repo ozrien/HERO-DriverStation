@@ -10,7 +10,7 @@ namespace HERO_DriverStationExample
 {
     public class Program
     {
-        static CTRE.HERO.PortDefinition wifiport = wifiport = new CTRE.HERO.Port1Definition();
+        static CTRE.HERO.PortDefinition wifiport = new CTRE.HERO.Port1Definition();
         static CTRE.FRC.DriverStation ds;
         static CTRE.Controller.GameController _gamepad;
         static CTRE.TalonSrx left1;

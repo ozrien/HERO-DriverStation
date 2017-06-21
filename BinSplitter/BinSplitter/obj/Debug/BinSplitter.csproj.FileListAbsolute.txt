@@ -1,0 +1,6 @@
+C:\Users\CoryNess\Documents\GitHub\ctre-cory\Firmware Writer\BinSplitter\BinSplitter\bin\Debug\BinSplitter.exe.config
+C:\Users\CoryNess\Documents\GitHub\ctre-cory\Firmware Writer\BinSplitter\BinSplitter\bin\Debug\BinSplitter.exe
+C:\Users\CoryNess\Documents\GitHub\ctre-cory\Firmware Writer\BinSplitter\BinSplitter\bin\Debug\BinSplitter.pdb
+C:\Users\CoryNess\Documents\GitHub\ctre-cory\Firmware Writer\BinSplitter\BinSplitter\obj\Debug\BinSplitter.exe
+C:\Users\CoryNess\Documents\GitHub\ctre-cory\Firmware Writer\BinSplitter\BinSplitter\obj\Debug\BinSplitter.pdb
+C:\Users\CoryNess\Documents\GitHub\ctre-cory\Firmware Writer\BinSplitter\BinSplitter\obj\Debug\BinSplitter.csprojResolveAssemblyReference.cache
