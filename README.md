@@ -2,6 +2,13 @@
 The driver station is a program created by FIRST that allows teams to control their robot wirelessly through a 2.4ghz Wifi radio.
 Normally, the driver station is allowed only to work with the RoboRIO and its own Driver station class, which handles the UDP frames by itself.
 The software in this repo is what is needed to make an [ESP12F module](http://www.ctr-electronics.com/gadgeteer-wifi-module.html#product_tabs_technical_resources) along with a [HERO development board](http://www.ctr-electronics.com/hro.html) to talk with the Driver station and provide enough functionality to get a robot to drive using the driver station.
+# What is in here?
+* Bin File - The .bin file for driver station functionality
+* BinSplitter - The project that takes a bin file and splits it into 11 25kb files that the HERO can use
+* Documentation - Folder for pictures and files that show how this was created
+* ESP_DriverStation_Source - Arduino source code for ESP module that enables driver station
+* HERO_DriverStationExample - Example project for enabling the driver station and controlling a robot using Arcade drive
+* HERO_ESP_Writer - Project that flashes the bin files to the ESP module
 # What is needed for functionality?
 All the hardware needed for this functionality is the HERO board and an ESP12F module along with a ribbon cable connecting the two.
 You are able to flash the module without a HERO, however it is much more complicated and requires a gadgeteer breakout, a 3.3v source, and a usb to ttl cable. Once you flash the module once it is possible to perform an Over the Air (OTA) update.
