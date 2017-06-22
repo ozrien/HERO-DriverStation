@@ -9,13 +9,13 @@ Software wise, a new firmware image needs to be flashed onto the ESP module, but
 ### Process for flashing the Module with HERO
 Plug in the ESP12F Module into port 1 of the HERO board. Open the solution "HERO_ESP_Writer" and deploy that to the HERO. The HERO will flash the module with the new firmware and it will be ready as soon as it's done.
 ### Process for flashing the Module with computer
-1. Set up hardware for connecting to ESP - I used a [GHI Extender module](https://www.ghielectronics.com/catalog/product/273), however these are discontinued and you can use two [Gadgeteer breakout modules](http://www.ctr-electronics.com/breakoutmodule.html) to gain access to the module pinout.
+1. Set up hardware for connecting to ESP - I used a [GHI Extender module](https://www.ghielectronics.com/catalog/product/273), however these are discontinued and you can use [Gadgeteer breakout modules](http://www.ctr-electronics.com/breakoutmodule.html) to gain access to the module pinout.
 2. Power module and connect Rx and Tx lines to computer - I used a HERO for power, however any 3.3V source will work. It must be 3.3 volts, 5 volts will not work. After, I used an [Adafruit TTL Cable](https://www.adafruit.com/product/954?gclid=Cj0KCQjw1a3KBRCYARIsABNRnxtK8RTC_wKpGkn1eU4h5SmxbFH8F3RiO4gLpn29Okpeme-1WKFXd1MaAh4YEALw_wcB) to connect the uart lines to the computer and commonized the ground as seen below
 ![TTl connection](Documentation/ESPHardwareFlash.jpg)
 3. Download either the [Arduino IDE](https://github.com/esp8266/Arduino) or the official [Espressif tool](http://bbs.espressif.com/viewtopic.php?f=5&t=433)
 4. Put ESP in bootloader mode by holding pin 3 to ground, and pulling pin 6 to ground for a second. You should see the blue light blink
-5. If using Arduino, open the source code and upload, if using the Espressif tool, point to the bin file and direct it to address 0x0 and start
-
+5. If using Arduino, open the source code and upload, if using the Espressif tool, point to the bin file and direct it to address 0x0 and start as seen below
+![ESP Tool](Documentation/EspressifFlasher.PNG)
 # How to use the Driver Station
 An example project is included that shows how to use the driver station class. The basic steps are:
 
@@ -37,6 +37,8 @@ An example project is included that shows how to use the driver station class. T
 ```
 # How this works
 The Driver station's protocol for sending data is largely hidden behind the scenes. Using a program called [Wireshark](https://www.wireshark.org/) I was able to find the individual datagrams and figure out what each byte meant, along with the ports the Driver station expects to use for transmitting and receiving data.
+
+Further documentation on this topic is inside the documentation folder, including a wireshark capture of the roborio-dashboard discussion over USB.
 ## Datagram breakdown
 * Driver Station to Robot (Port 57655 -> Port 1110)
   * 1,2 Packet # - These two bytes, big endian, specify what number packet this is, and is used for latency control on the Driver Station
