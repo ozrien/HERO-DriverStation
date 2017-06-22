@@ -50,10 +50,20 @@ Further documentation on this topic is inside the documentation folder, includin
   * 4 Robot State - Specifies what state the robot is in, 0-2 is Teleop, Test, Auton disabled respectively, 4-6 is the enabled version
   * 5,6 Unknown currently
   * 7- Joystick data, length varies on type of joystick and how many are plugged in. For detailed information look at Driverstation Class
+* Joystick Data
+  * 1 - Number of bytes for joystick
+  * 2,3 - Unknown currently (I think it's joystick model)
+  * 4 - X number of joysticks
+  * 5-(X+5) - Joystick axis data (signed byte) (each byte is an axis)
+  * (X+6) - number of buttons
+  * (X+7),(X+8) - bitmap of buttons
+  * (X+9) - Number of POV's/Hats
+  * (X+10),(x+11) - POV direction (unsigned byte)
 * Robot to Driver Station (Port 34959 -> Port 1150)
   * 1-4 Same first four bytes from Driver station, ensures packets were sent correctly
   * 5-7 Battery voltage, first byte is integer voltage, second and third is decimal voltage
   * 8- Unknown currently
+  
 Below is a picture of a capture from Wireshark with the UDP packet from the computer to the RoboRIO, only one joystick connected.
 
 
