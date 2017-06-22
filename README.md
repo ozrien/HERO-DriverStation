@@ -62,11 +62,11 @@ Further documentation on this topic is inside the documentation folder, includin
   * 1 - Number of bytes for joystick
   * 2,3 - Unknown currently (I think it's joystick model)
   * 4 - X number of joysticks
-  * 5-(X+5) - Joystick axis data (signed byte) (each byte is an axis)
-  * (X+6) - number of buttons
-  * (X+7),(X+8) - bitmap of buttons
-  * (X+9) - Number of POV's/Hats
-  * (X+10),(x+11) - POV direction (unsigned byte)
+  * 5-(X+4) - Joystick axis data (signed byte) (each byte is an axis)
+  * (X+5) - number of buttons
+  * (X+6),(X+7) - bitmap of buttons
+  * (X+8) - Number of POV's/Hats
+  * (X+9),(x+10) - POV direction (unsigned byte)
 * Robot to Driver Station (Port 34959 -> Port 1150)
   * 1-4 Same first four bytes from Driver station, ensures packets were sent correctly
   * 5-7 Battery voltage, first byte is integer voltage, second and third is decimal voltage
