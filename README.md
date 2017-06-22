@@ -4,7 +4,7 @@ Normally, the driver station is allowed only to work with the RoboRIO and its ow
 The software in this repo is what is needed to make an [ESP12F module](http://www.ctr-electronics.com/gadgeteer-wifi-module.html#product_tabs_technical_resources) along with a [HERO development board](http://www.ctr-electronics.com/hro.html) to talk with the Driver station and provide enough functionality to get a robot to drive using the driver station.
 # What is needed for functionality?
 All the hardware needed for this functionality is the HERO board and an ESP12F module along with a ribbon cable connecting the two.
-You are able to flash the module without a HERO, however it is much more complicated.
+You are able to flash the module without a HERO, however it is much more complicated and requires a gadgeteer breakout, a 3.3v source, and a usb to ttl cable. Once you flash the module once it is possible to perform an Over the Air (OTA) update.
 Software wise, a new firmware image needs to be flashed onto the ESP module, but the ability to do so is done through the HERO itself, and an example project is set up to work with the new driverstation class.
 ### Process for flashing the Module with HERO
 Plug in the ESP12F Module into port 1 of the HERO board. Open the solution "HERO_ESP_Writer" and deploy that to the HERO. The HERO will flash the module with the new firmware and it will be ready as soon as it's done.
@@ -19,7 +19,8 @@ Plug in the ESP12F Module into port 1 of the HERO board. Open the solution "HERO
 
 <img src="Documentation/EspressifFlasher.PNG" alt="ESP Tool" width="200"/>
 
-
+### Process for flashing the module OTA
+Connect to the module over wifi and find its IP. Put the IP into a web browser of your choice, and append /update onto the address. You will be presented with two buttons, click the left one, choose the bin file, and click update. The bin file will be uploaded to the module and flashed by itself
 # How to use the Driver Station
 An example project is included that shows how to use the driver station class. The basic steps are:
 
