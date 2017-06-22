@@ -15,7 +15,11 @@ Plug in the ESP12F Module into port 1 of the HERO board. Open the solution "HERO
 3. Download either the [Arduino IDE](https://github.com/esp8266/Arduino) or the official [Espressif tool](http://bbs.espressif.com/viewtopic.php?f=5&t=433)
 4. Put ESP in bootloader mode by holding pin 3 to ground, and pulling pin 6 to ground for a second. You should see the blue light blink
 5. If using Arduino, open the source code and upload, if using the Espressif tool, point to the bin file and direct it to address 0x0 and start as seen below
-![ESP Tool](Documentation/EspressifFlasher.PNG)
+
+
+<img src="Documentation/EspressifFlasher.PNG" alt="ESP Tool" width="200"/>
+
+
 # How to use the Driver Station
 An example project is included that shows how to use the driver station class. The basic steps are:
 
@@ -51,7 +55,11 @@ Further documentation on this topic is inside the documentation folder, includin
   * 5-7 Battery voltage, first byte is integer voltage, second and third is decimal voltage
   * 8- Unknown currently
 Below is a picture of a capture from Wireshark with the UDP packet from the computer to the RoboRIO, only one joystick connected.
-![pic](Documentation/Wireshark.PNG)
+
+
+<img src="Documentation/Wireshark.PNG" width="500"/>
+
+
 ## Firmware Flashing
 The ESP's protocol to flashing an image into its flash is controlled through a ROM bootloader. This bootloader expects certain packets to come in, with details on the packet in the packet header. The overall process for flashing an image is
 1. Put ESP into bootloader mode by pulling GPIO0 down (Pin 3 on the HERO Gadgeteer port) and resetting the module by pulling RESET down (Pin 6 on the HERO)
