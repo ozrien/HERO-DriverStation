@@ -1,10 +1,26 @@
-﻿/**
- * Example HERO application can reads a serial port and echos the bytes back.
- * After deploying this application, the user can open a serial terminal and type while the HERO echoes the typed keys back.
- * Use a USB to UART (TTL) cable like the Adafruit Raspberry PI or FTDI-TTL cable.
- * Use device manager to figure out which serial port number to select in your PC terminal program.
- * HERO Gadgeteer Port 1 is used in this example, but can be changed at the top of Main().
+﻿/*
+ *  Software License Agreement
+ *
+ * Copyright (C) Cross The Road Electronics.  All rights
+ * reserved.
+ * 
+ * Cross The Road Electronics (CTRE) licenses to you the right to 
+ * use, publish, and distribute copies of CRF (Cross The Road) binary firmware files (*.crf) 
+ * and software example source ONLY when in use with Cross The Road Electronics hardware products.
+ * 
+ * THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS" WITHOUT
+ * WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT
+ * LIMITATION, ANY WARRANTY OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT SHALL
+ * CROSS THE ROAD ELECTRONICS BE LIABLE FOR ANY INCIDENTAL, SPECIAL, 
+ * INDIRECT OR CONSEQUENTIAL DAMAGES, LOST PROFITS OR LOST DATA, COST OF
+ * PROCUREMENT OF SUBSTITUTE GOODS, TECHNOLOGY OR SERVICES, ANY CLAIMS
+ * BY THIRD PARTIES (INCLUDING BUT NOT LIMITED TO ANY DEFENSE
+ * THEREOF), ANY CLAIMS FOR INDEMNITY OR CONTRIBUTION, OR OTHER
+ * SIMILAR COSTS, WHETHER ASSERTED ON THE BASIS OF CONTRACT, TORT
+ * (INCLUDING NEGLIGENCE), BREACH OF WARRANTY, OR OTHERWISE
  */
+
 using System;
 using System.Threading;
 using Microsoft.SPOT;
