@@ -9,6 +9,7 @@ Software wise, a new firmware image needs to be flashed onto the ESP module, but
 Plug in the ESP12F Module into port 1 of the HERO board. Open the solution "HERO_ESP_Writer" and deploy that to the HERO. The HERO will flash the module with the new firmware and it will be ready as soon as it's done.
 # How to use the Driver Station
 An example project is included that shows how to use the driver station class. The basic steps are:
+
 *Define the Driver Station object, specify a port*
 ```c#
   CTRE.FRC.DriverStation ds = new CTRE.FRC.DriverStation(new new CTRE.HERO.Port1Definition());
@@ -37,3 +38,24 @@ The Driver station's protocol for sending data is largely hidden behind the scen
   * 1-4 Same first four bytes from Driver station, ensures packets were sent correctly
   * 5-7 Battery voltage, first byte is integer voltage, second and third is decimal voltage
   * 8- Unknown currently
+### Firmware Flashing
+The ESP's protocol to flashing an image into its flash is controlled through a ROM bootloader. This bootloader expects certain packets to come in, with details on the packet in the packet header. The overall process for flashing an image is
+1. Put ESP into bootloader mode by pulling GPIO0 down (Pin 3 on the HERO Gadgeteer port) and resetting the module by pulling RESET down (Pin 6 on the HERO)
+2. Sync baud rate of ESP to baud rate on flasher - this is done using a special packet that sends AA to the module multiple times
+3. Erase flash on module - Another packet is sent that specifies the amount of space needed for the flash
+4. Send .bin contents - Multiple packets are sent with the .bin contents inside them
+5. Close the bootloader - A single packet is sent with the end command to take the module out of bootloader mode.
+### Firmware protococol
+For those wanting to create their own flashing tool, this may prove helpful
+#### Packet header protocol
+Largely based off [this](http://domoticx.com/esp8266-esptool-bootloader-communicatie/) sheet, it details exactly what is needed in the packet header and how to go about flashing the firmmware.
+
+Key notes: 
+* The module uses [SLIP](https://en.wikipedia.org/wiki/Serial_Line_Internet_Protocol) protocol, which means except for the header and footer, there are no 0xC0's in the packets, and so they must be replaced if they are needed.
+* Checksum is created by doing XOR operation on all data bytes before the SLIP framing is done, and then that must be framed in case it is a 0xC0 or 0xDB
+* Length of data is calculated before the SLIP framing
+* You must make sure the other end is done talking before you can talk yourself
+* Currently the amount of Flash to be erased is hard coded in this code, if you want to flash a large file you must change that byte word yourself
+* I have only encounted two kinds of errors from the module, a 0x01 0x07 & 0x01 0x05
+  * 0x07 - Not fatal, module can still be flashed (I believe it is warning the flasher that it is currently downloading the last bin packet)
+  * 0x05 - Fatal, module must be reflashed (I believe it is a checksum error)
