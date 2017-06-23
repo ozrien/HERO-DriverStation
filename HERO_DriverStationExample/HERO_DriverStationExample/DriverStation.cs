@@ -210,12 +210,12 @@ namespace CTRE.FRC
             {
                 string s = voltage.ToString();
                 string[] p = s.Split('.');
-                byte p1 = 0;
-                byte p2 = 0;
+                byte p1 = (byte)(int)voltage;
+                voltage -= (float)(p1 + 0.005);
+                byte p2 = (byte)(int)((voltage / 10) * 255);
                 p1 = byte.Parse(p[0]);
                 p2 = (byte)((int.Parse(p[1]) / (float)1000) * 255);
-                if(p1 > 1 && p2 > 1)
-                    _uart.Write(new byte[] { (byte)'b', (byte) 'a', (byte) ' ', p1, (byte) ' ', p2 }, 0, 6);
+                _uart.Write(new byte[] { (byte)'b', (byte) 'a', (byte) ' ', p1, (byte) ' ', p2 }, 0, 6);
             }
         }
 
