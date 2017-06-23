@@ -3,7 +3,7 @@ The driver station is a program created by FIRST that allows teams to control th
 Normally, the driver station is allowed only to work with the RoboRIO and its own Driver station class, which handles the UDP frames by itself.
 The software in this repo is what is needed to make an [ESP12F module](http://www.ctr-electronics.com/gadgeteer-wifi-module.html#product_tabs_technical_resources) along with a [HERO development board](http://www.ctr-electronics.com/hro.html) to talk with the Driver station and provide enough functionality to get a robot to drive using the driver station.
 # Quick Start Guide
-1. Ensure HERO is imaged with latest firmware
+1. Ensure HERO is imaged with latest firmware, see below for instructions on flashing the latest firmware
 2. Connect ESP Module to port 1 of HERO
 3. Deploy HERO_ESP_Writer project to HERO
 4. Keep an eye on the logs to ensure the file is written
@@ -24,6 +24,15 @@ The software in this repo is what is needed to make an [ESP12F module](http://ww
   * Subnet mask: 255.0.0.0
   * Default gateway: 10.0.33.1
 7. Click OK and exit out of everything
+## Flashing the HERO
+1. Connect HERO to computer using A to A USB cable
+2. While connecting HERO to computer, hold down button putting it into bootloader mode
+3. Open Lifeboat imager
+4. Select correct firmware, at the time of this writing it was 0.11.2.0.crf
+5. Press Image HERO
+
+<img src="Documentation/HEROFlashing.PNG" width="500"/>
+
 # What is in here?
 * Bin File - The .bin file for driver station functionality
 * BinSplitter - The project that takes a bin file and splits it into 11 25kb files that the HERO can use
@@ -37,17 +46,6 @@ You are able to flash the module without a HERO, however it is much more complic
 Software wise, a new firmware image needs to be flashed onto the ESP module, but the ability to do so is done through the HERO itself, and an example project is set up to work with the new driverstation class.
 ### Process for flashing the Module with HERO
 Look at Quick Start Guide above
-### Process for flashing the Module with computer
-1. Set up hardware for connecting to ESP - I used a [GHI Extender module](https://www.ghielectronics.com/catalog/product/273), however these are discontinued and you can use [Gadgeteer breakout modules](http://www.ctr-electronics.com/breakoutmodule.html) to gain access to the module pinout.
-2. Power module and connect Rx and Tx lines to computer - I used a HERO for power, however any 3.3V source will work. It must be 3.3 volts, 5 volts will not work. After, I used an [Adafruit TTL Cable](https://www.adafruit.com/product/954?gclid=Cj0KCQjw1a3KBRCYARIsABNRnxtK8RTC_wKpGkn1eU4h5SmxbFH8F3RiO4gLpn29Okpeme-1WKFXd1MaAh4YEALw_wcB) to connect the uart lines to the computer and commonized the ground as seen below
-![TTl connection](Documentation/ESPHardwareFlash.jpg)
-3. Download either the [Arduino IDE](https://github.com/esp8266/Arduino) or the official [Espressif tool](http://bbs.espressif.com/viewtopic.php?f=5&t=433)
-4. Put ESP in bootloader mode by holding pin 3 to ground, and pulling pin 6 to ground for a second. You should see the blue light blink
-5. If using Arduino, open the source code and upload, if using the Espressif tool, point to the bin file and direct it to address 0x0 and start as seen below
-
-
-<img src="Documentation/EspressifFlasher.PNG" alt="ESP Tool" width="200"/>
-
 ### Process for flashing the module OTA
 Connect to the module over wifi and find its IP. Put the IP into a web browser of your choice, and append /update onto the address. You will be presented with two buttons, click the left one, choose the bin file, and click update. The bin file will be uploaded to the module and flashed by itself
 # How to use the Driver Station
@@ -69,6 +67,8 @@ An example project is included that shows how to use the driver station class. T
 ```c#
   var y = _gamepad.getAxis(1);
 ```
+# Functions of Driver station
+ToDo
 # How this works
 The Driver station's protocol for sending data is largely hidden behind the scenes. Using a program called [Wireshark](https://www.wireshark.org/) I was able to find the individual datagrams and figure out what each byte meant, along with the ports the Driver station expects to use for transmitting and receiving data.
 
