@@ -2,6 +2,28 @@
 The driver station is a program created by FIRST that allows teams to control their robot wirelessly through a 2.4ghz Wifi radio.
 Normally, the driver station is allowed only to work with the RoboRIO and its own Driver station class, which handles the UDP frames by itself.
 The software in this repo is what is needed to make an [ESP12F module](http://www.ctr-electronics.com/gadgeteer-wifi-module.html#product_tabs_technical_resources) along with a [HERO development board](http://www.ctr-electronics.com/hro.html) to talk with the Driver station and provide enough functionality to get a robot to drive using the driver station.
+# Quick Start Guide
+1. Ensure HERO is imaged with latest firmware
+2. Connect ESP Module to port 1 of HERO
+3. Deploy HERO_ESP_Writer project to HERO
+4. Keep an eye on the logs to ensure the file is written
+5. Once the Module is flashed, connect to its WiFi. The password is "password1"
+6. Set computer to static IP (Process below)
+7. Deploy HERO_DriverStationExample to HERO
+8. Open FRC Driver station
+9. Put in team 33
+10. You're good to go
+## Setting Computer to static IP
+1. Right click on wireless connections, the button you pressed to connect to the module
+2. Click on Network and Sharing Center
+3. Click on the network in the middle right next to Connections
+4. Click on Properties
+5. Click on Internet Protocol Version 4 (TCP/IPv4) and click Properties
+6. Check Use the following IP address
+  * IP address: 10.0.33.5
+  * Subnet mask: 255.0.0.0
+  * Default gateway: 10.0.33.1
+7. Click OK and exit out of everything
 # What is in here?
 * Bin File - The .bin file for driver station functionality
 * BinSplitter - The project that takes a bin file and splits it into 11 25kb files that the HERO can use
@@ -14,7 +36,7 @@ All the hardware needed for this functionality is the HERO board and an ESP12F m
 You are able to flash the module without a HERO, however it is much more complicated and requires a gadgeteer breakout, a 3.3v source, and a usb to ttl cable. Once you flash the module once it is possible to perform an Over the Air (OTA) update.
 Software wise, a new firmware image needs to be flashed onto the ESP module, but the ability to do so is done through the HERO itself, and an example project is set up to work with the new driverstation class.
 ### Process for flashing the Module with HERO
-Plug in the ESP12F Module into port 1 of the HERO board. Open the solution "HERO_ESP_Writer" and deploy that to the HERO. The HERO will flash the module with the new firmware and it will be ready as soon as it's done.
+Look at Quick Start Guide above
 ### Process for flashing the Module with computer
 1. Set up hardware for connecting to ESP - I used a [GHI Extender module](https://www.ghielectronics.com/catalog/product/273), however these are discontinued and you can use [Gadgeteer breakout modules](http://www.ctr-electronics.com/breakoutmodule.html) to gain access to the module pinout.
 2. Power module and connect Rx and Tx lines to computer - I used a HERO for power, however any 3.3V source will work. It must be 3.3 volts, 5 volts will not work. After, I used an [Adafruit TTL Cable](https://www.adafruit.com/product/954?gclid=Cj0KCQjw1a3KBRCYARIsABNRnxtK8RTC_wKpGkn1eU4h5SmxbFH8F3RiO4gLpn29Okpeme-1WKFXd1MaAh4YEALw_wcB) to connect the uart lines to the computer and commonized the ground as seen below
