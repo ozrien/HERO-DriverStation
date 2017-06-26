@@ -36,8 +36,7 @@ namespace HERO_DriverStationExample
         static CTRE.TalonSrx left1;
         static CTRE.TalonSrx right1;
         static StringBuilder stringBuilder = new StringBuilder();
-
-        const int TEAM_NUMBER = 33; //Team number DS tries connecting to
+        
         //Password to module wifi is "password1"
 
         /** entry point of the application */
@@ -53,7 +52,7 @@ namespace HERO_DriverStationExample
             right1.SetControlMode(CTRE.TalonSrx.ControlMode.kPercentVbus);
 
             //Set IP module looks for and is configured with, Computer must set to Static IP
-            ds.SendIP("10 0 " + TEAM_NUMBER.ToString() + " 5", "10 0 " + TEAM_NUMBER.ToString() + " 2");
+            ds.SendIP("10 0 33 5", "10 0 33 2");
 
 
             while (true)

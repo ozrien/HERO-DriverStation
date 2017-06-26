@@ -45,6 +45,8 @@ File f;
 uint16_t currentTime;
 const uint16_t timeout = 30;
 bool writing = true;
+byte hearbeat = 0x10;
+int timer = 0;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,7 +133,8 @@ void loop() {
       Serial.println();
       writing = false;
     }
-    byte writeData[] = { data[0],  data[1], data[2], data[3], 49, battery[0], battery[1], 0 };
+    //                                                        0x10 or 0x31 depending on connected to HERO or not
+    byte writeData[] = { data[0],  data[1], data[2], data[3], hearbeat, battery[0], battery[1], 0 };
     Udp.beginPacket(computer, sendPort);
     Udp.write(writeData, 8);
     Udp.endPacket();
@@ -173,9 +176,9 @@ void loop() {
     }
     if(buf[index] = 'b' && buf[index + 1] == 'a')//Starts with BA, getting battery voltage and sending it to DS
     {
-      battery[0] = buf[3];
-      battery[1] = buf[5];
-      index = 6;//Push index into next area to check if there's a UDP stream coming in
+      battery[0] = buf[index + 3];
+      battery[1] = buf[index + 5];
+      index += 6;//Push index into next area to check if there's a UDP stream coming in
     }
     if(buf[index] = 'u' && buf[index + 1] == 's')//Starts with US, Send UDP data to specified port
     {
@@ -196,12 +199,17 @@ void loop() {
       Udp.write(sendDat, dataSize);
       Udp.endPacket();
     }
+    timer = 0;
   }
   lastLen = Serial.available();
 
 //Host Webpage///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   server.handleClient();
 
+  timer++;
+  if(timer < 100) hearbeat = 0x31;
+  else hearbeat = 0x10;
+  
   webCounter++;
   delay(1);//Delay for delaying purposes
 }
