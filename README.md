@@ -31,10 +31,12 @@ This is what a successful module flash looks like
 7. Click OK and exit out of everything
 ## Flashing the HERO
 1. Connect HERO to computer using A to A USB cable
-2. While connecting HERO to computer, hold down button putting it into bootloader mode
+2. While connecting HERO to computer, hold down the button on the HERO putting it into bootloader mode
 3. Open Lifeboat imager
 4. Select correct firmware, at the time of this writing it was 0.11.2.0.crf
 5. Press Image HERO
+
+For more information on flashing the HERO, go [here](http://www.ctr-electronics.com/downloads/pdf/HERO%20User's%20Guide.pdf) to the user guide 
 
 <img src="Documentation/HEROFlashing.PNG" width="500"/>
 
@@ -57,7 +59,7 @@ This is what a successful module flash looks like
 * HERO_ESP_Writer - Project that flashes the bin files to the ESP module
 # What is needed for functionality?
 All the hardware needed for this functionality is the HERO board and an ESP12F module along with a ribbon cable connecting the two.
-You are able to flash the module without a HERO, however it is much more complicated and requires a gadgeteer breakout, a 3.3v source, and a usb to ttl cable. Once you flash the module once it is possible to perform an Over the Air (OTA) update.
+Once you flash the module once it is possible to perform an Over the Air (OTA) update.
 Software wise, a new firmware image needs to be flashed onto the ESP module, but the ability to do so is done through the HERO itself, and an example project is set up to work with the new driverstation class.
 ### Process for flashing the Module with HERO
 Look at Quick Start Guide above
@@ -80,7 +82,7 @@ An example project is included that shows how to use the driver station class. T
 ```
 *Treat the controller as a normal controller*
 ```c#
-  var y = _gamepad.getAxis(1);
+  float y = _gamepad.getAxis(1);
 ```
 # Key notes in the Firmware
 The Module firmware currently hard codes the SSID and Password into the module. If you would like to change that, or do anything else with the firmware, you are free to. For SSID and Password it is inside the setup function under the function WiFi.softAP, use the search function to find it. In order to flash the module with the new firmware, follow these next few steps.
@@ -115,7 +117,8 @@ Further documentation on this topic is inside the documentation folder, includin
   * (X+9),(x+10) - POV direction (unsigned byte)
 * Robot to Driver Station (Port 34959 -> Port 1150)
   * 1-4 Same first four bytes from Driver station, ensures packets were sent correctly
-  * 5-7 Battery voltage, first byte is integer voltage, second and third is decimal voltage
+  * 5-6 Battery voltage, first byte is integer voltage, second is decimal voltage
+  * 7 - Comms/Robot code, 0x31 for Comms and robot code, 0x10 for just Comms
   * 8- Unknown currently
   
 Below is a picture of a capture from Wireshark with the UDP packet from the computer to the RoboRIO, only one joystick connected.
