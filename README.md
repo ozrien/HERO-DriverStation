@@ -13,6 +13,11 @@ The software in this repo is what is needed to make an [ESP12F module](http://ww
 8. Open FRC Driver station
 9. Put in team 33
 10. You're good to go
+
+This is what a successful module flash looks like
+
+<img src="Documentation/SuccessfulFlash.PNG" width="900"/>
+
 ## Setting Computer to static IP
 1. Right click on wireless connections, the button you pressed to connect to the module
 2. Click on Network and Sharing Center
@@ -22,7 +27,7 @@ The software in this repo is what is needed to make an [ESP12F module](http://ww
 6. Check Use the following IP address
   * IP address: 10.0.33.5
   * Subnet mask: 255.0.0.0
-  * Default gateway: 10.0.33.1
+  * Default gateway: Blank
 7. Click OK and exit out of everything
 ## Flashing the HERO
 1. Connect HERO to computer using A to A USB cable
@@ -32,6 +37,16 @@ The software in this repo is what is needed to make an [ESP12F module](http://ww
 5. Press Image HERO
 
 <img src="Documentation/HEROFlashing.PNG" width="500"/>
+
+# Functional Features of Driver Station
+* Selecting mode robot is in, ie Teleop Enabled, Auton disabled, Test disabled
+* Enable/Disable safety, Watchdog is automatically fed if enabled, otherwise it isn't
+* Communications and Robot code indicators work as expected
+* Multiple joysticks
+* Round trip time graph on Driver Station
+* Battery voltage can be sent to driver station
+
+<img src="Documentation/DriverStation.PNG" width = "900"/>
 
 # What is in here?
 * Bin File - The .bin file for driver station functionality
@@ -67,8 +82,17 @@ An example project is included that shows how to use the driver station class. T
 ```c#
   var y = _gamepad.getAxis(1);
 ```
-# Functions of Driver station
-ToDo
+# Key notes in the Firmware
+The Module firmware currently hard codes the SSID and Password into the module. If you would like to change that, or do anything else with the firmware, you are free to. For SSID and Password it is inside the setup function under the function WiFi.softAP, use the search function to find it. In order to flash the module with the new firmware, follow these next few steps.
+1. Run the Binary Splitter project, and point to the bin file from the arduino compile
+2. Find the 11 bin files the project will spit out.
+3. Open the wifi esp flasher project
+4. Right click on the project under project view, and go into properties
+5. Go under the resources tab, in the upper left there is a drop down, make sure it's set to files
+6. Delete all the files inside the viewer
+7. Copy and paste the 11 bin files you found earlier into the viewer, click ok to every prompt
+8. Save the properties and run the program as if you were flashing the wifi module normally.
+9. You're good to go
 # How this works
 The Driver station's protocol for sending data is largely hidden behind the scenes. Using a program called [Wireshark](https://www.wireshark.org/) I was able to find the individual datagrams and figure out what each byte meant, along with the ports the Driver station expects to use for transmitting and receiving data.
 
