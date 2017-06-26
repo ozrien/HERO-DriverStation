@@ -46,8 +46,8 @@ namespace HERO_DriverStationExample
             _gamepad = new CTRE.Controller.GameController(ds, 0); //Set controller to look at DS with ID 0
 
             //Create two TalonSrx objects and set their control mode
-            left1 = new CTRE.TalonSrx(0);
-            right1 = new CTRE.TalonSrx(1);
+            left1 = new CTRE.TalonSrx(1);
+            right1 = new CTRE.TalonSrx(2);
             left1.SetControlMode(CTRE.TalonSrx.ControlMode.kPercentVbus);
             right1.SetControlMode(CTRE.TalonSrx.ControlMode.kPercentVbus);
 
