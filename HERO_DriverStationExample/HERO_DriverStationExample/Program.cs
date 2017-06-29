@@ -61,7 +61,7 @@ namespace HERO_DriverStationExample
                 ds.update();
 
                 //Send Battery Voltage information to Driver Station
-                ds.SendBattery(11.12f);
+                ds.SendBattery(12.12f);
 
 
                 if (ds.IsAuton() && ds.IsEnabled())

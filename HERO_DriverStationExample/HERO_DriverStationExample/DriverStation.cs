@@ -35,6 +35,7 @@ namespace CTRE.FRC
         bool _enabled;
         bool _connected;
         bool _updateFlag;
+        byte[] _sendingMessage;
         /** Cache for reading out bytes in serial driver. */
         static int lastBytesToRead = 0;
         Stopwatch _timeout = new Stopwatch();
@@ -91,11 +92,17 @@ namespace CTRE.FRC
             _data = new byte[255];
             _timeout.Start();
             _enableTimeout.Start();
+            _sendingMessage = new byte[1] { 0x33 };
         }
         
         public void update()
         {
+            _sendingMessage = combine(_sendingMessage, new byte[1] { 0x33 });
+            _uart.Write(_sendingMessage, 0, _sendingMessage.Length);
+            _sendingMessage = new byte[0];
             _updateFlag = false;
+            _sendingMessage = new byte[1];
+
             int startCount = 0;
             //Check if there's data coming in, write to data cache if there is
             if (lastBytesToRead == _uart.BytesToRead && _uart.BytesToRead > 0)
@@ -215,7 +222,7 @@ namespace CTRE.FRC
                 byte p2 = (byte)(int)((voltage / 10) * 255);
                 p1 = byte.Parse(p[0]);
                 p2 = (byte)((int.Parse(p[1]) / (float)1000) * 255);
-                _uart.Write(new byte[] { (byte)'b', (byte) 'a', (byte) ' ', p1, (byte) ' ', p2 }, 0, 6);
+                _sendingMessage = combine(_sendingMessage, (new byte[] { (byte)'b', (byte)'a', (byte)' ', (byte)p1, (byte)' ', (byte)p2 }));
             }
         }
 
@@ -225,7 +232,7 @@ namespace CTRE.FRC
             {
                 string content = "ip " + targetIP + " " + moduleIP;
                 byte[] b = System.Text.Encoding.UTF8.GetBytes(content);
-                _uart.Write(b, 0, b.Length);
+                _sendingMessage = combine(_sendingMessage, b);
             }
         }
 
@@ -235,8 +242,8 @@ namespace CTRE.FRC
             {
                 string beginning = "us " + port + " ";
                 byte[] b = System.Text.Encoding.UTF8.GetBytes(beginning);
-                _uart.Write(b, 0, b.Length);
-                _uart.Write(data, 0, data.Length);
+                _sendingMessage = combine(_sendingMessage, b);
+                _sendingMessage = combine(_sendingMessage, data);
             }
         }
 
@@ -303,6 +310,14 @@ namespace CTRE.FRC
                 //}
             }
             return _updateFlag ? 1 : 0;
+        }
+
+        private byte[] combine(byte[] a, byte[] b)
+        {
+            byte[] c = new byte[a.Length + b.Length];
+            Array.Copy(a, c, a.Length);
+            Array.Copy(b, 0, c, a.Length, b.Length);
+            return c;
         }
     }
 }
