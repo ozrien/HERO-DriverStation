@@ -42,3 +42,4 @@ C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\HERO_ESP_Writer\HERO_ESP_W
 C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\HERO_ESP_Writer\HERO_ESP_Writer\obj\Debug\le\HERO Serial Example.pdbx
 C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\HERO_ESP_Writer\HERO_ESP_Writer\obj\Debug\HERO Serial Example.exe
 C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\HERO_ESP_Writer\HERO_ESP_Writer\obj\Debug\HERO Serial Example.pdb
+C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\HERO_ESP_Writer\HERO_ESP_Writer\obj\Debug\HERO_ESP_Writer.csproj.CoreCompileInputs.cache

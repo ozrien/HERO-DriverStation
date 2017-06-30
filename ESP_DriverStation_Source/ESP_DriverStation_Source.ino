@@ -121,16 +121,23 @@ void loop() {
   if(dSize)
   {
     packetCounter++;
+    uint16_t checksum = 0xAA;
     byte len = Udp.read(data, 100);
     if(writing)
     {
       Serial.write(0xAA);//First byte is header
       Serial.write(len);//Second byte is how many bytes should be received
+      checksum += len;
       for(int i = 0; i < len; i++)
       {
         Serial.write(data[i]);
+        checksum += data[i];
       }
-      Serial.println();
+      checksum = 0 - checksum;
+      uint8_t c1 = checksum >> 8;
+      uint8_t c2 = checksum - (c1 << 8);
+      Serial.write(c1);
+      Serial.write(c2);
       writing = false;
     }
     //                                                        0x10 or 0x31 depending on connected to HERO or not

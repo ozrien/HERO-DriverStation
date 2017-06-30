@@ -10,3 +10,4 @@ C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\BinSplitter\BinSplitter\ob
 C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\BinSplitter\BinSplitter\bin\Debug\BinSplitter.exe
 C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\BinSplitter\BinSplitter\bin\Debug\BinSplitter.pdb
 C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\BinSplitter\BinSplitter\obj\Debug\BinSplitter.csprojResolveAssemblyReference.cache
+C:\Users\CoryNess\Documents\GitHub\HERO-DriverStation\BinSplitter\BinSplitter\obj\Debug\BinSplitter.csproj.CoreCompileInputs.cache
