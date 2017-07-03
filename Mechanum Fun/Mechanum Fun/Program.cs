@@ -26,10 +26,10 @@ namespace Mechanum_Fun
 
             bool leftLast = false;
             bool rightLast = false;
-
             while(true)
             {
                 ds.update();
+                ds.SendBattery(12.34f);
                 float t = deltaTime();
                 CTRE.FRC.DriverStation.State s = ds.GetState();
                 if (ds.IsEnabled())
@@ -54,7 +54,9 @@ namespace Mechanum_Fun
                     pigeon.GetYawPitchRoll(ypr);
                     turn = ypr[0];
                 }
-                
+
+                byte[] b = new byte[] { (byte)'h', (byte)'e', (byte)'l', (byte)'l', (byte)'o' };
+                ds.SendUDP(2550, b);
             }
         }
         

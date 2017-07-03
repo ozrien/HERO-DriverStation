@@ -29,7 +29,7 @@
 
 byte computer[4];//Computer Address
 byte module[4];//ESP Module Address
-byte battery[2] = {33, 84};//Battery bytes
+byte battery[2] = {0, 0};//Battery bytes
 const uint16_t sendPort = 1150;//DS Expected port to send data
 const uint16_t receivePort = 1110;//DSD Expected port to receive data
 
@@ -43,13 +43,51 @@ uint16_t packetCounter = 0;
 File f;
 
 uint16_t currentTime;
-const uint16_t timeout = 30;
+const uint16_t timeout = 10;
 bool writing = true;
 byte hearbeat = 0x10;
 int timer = 0;
 
+enum ProcessState
+{
+  header1,
+  header2,
+  lenAssign,
+  payload,
+  ipAssign,
+  batAssign,
+  udpSend
+};
+ProcessState currentState = header1;
+ProcessState payloadState = ipAssign;
+byte h1;
+byte len = 0;
+byte iterator = 0;
+byte serialData[255];
+
+byte tx[255];
+uint16_t txIn = 0;
+uint16_t txOut = 0;
+uint16_t txCnt = 0;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void pushByte(byte b)
+{
+  tx[txIn++] = b;
+  txCnt++;
+  if(txIn >= 255)
+    txIn = 0;
+}
+
+byte popByte()
+{
+  byte ret = tx[txOut++];
+  txCnt--;
+  if(txOut >= 255)
+    txOut = 0;
+  return ret;
+}
+
 String webPage()
 {
   String s = "<!DOCTYPE HTML><html>";
@@ -89,14 +127,16 @@ void setup() {
   }
   else
   {
-    for(int i = 0; i < 4; i++)
-    {
-      computer[i] = f.parseInt();
-    }
-    for(int i = 0; i < 4; i++)
-    {
-      module[i] = f.parseInt();
-    }
+    char ipconfigs[8];
+    f.readBytes(ipconfigs, 8);
+    module[0] = ipconfigs[0];
+    module[1] = ipconfigs[1];
+    module[2] = ipconfigs[2];
+    module[3] = ipconfigs[3];
+    computer[0] = ipconfigs[4];
+    computer[1] = ipconfigs[5];
+    computer[2] = ipconfigs[6];
+    computer[3] = ipconfigs[7];
     f.close();
   }
   
@@ -150,65 +190,123 @@ void loop() {
   else { currentTime++; }
 
 //Read data from Serial bus and process it////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if(Serial.available() && Serial.available() == lastLen)
+  if(Serial.available())
   {
-    char buf[255];
-    for(int i = 0; i < 255; i++) buf[i] = 0x00;
-    for(int i = 0; Serial.available() && i < 255; i++)
+    for(int i = 0; i < Serial.available(); i++)
     {
-      buf[i] = Serial.read();
-    }
-    int index = 0;
-    if(buf[index] == 'i' && buf[index + 1] =='p')//starts with IP, configuring target and current ip
-    {
-      index++;
-      f = SPIFFS.open("/config.txt", "w+");
-      for(int i = 3; buf[i] != 0x00; i++) f.print(buf[i]);
-      f.close();
-      f = SPIFFS.open("/config.txt", "r");
-      byte target[4];
-      byte current[4];
-
-      for(int i = 0; i < 4; i++)
-      {
-        target[i] = f.parseInt();
-      }
-      for(int i = 0; i < 4; i++)
-      {
-        current[i] = f.parseInt();
-      }
-      
-      memcpy(computer, target, 4);
-      WiFi.softAPConfig(current, target, {255, 255, 255, 0});
-    }
-    if(buf[index] = 'b' && buf[index + 1] == 'a')//Starts with BA, getting battery voltage and sending it to DS
-    {
-      battery[0] = buf[index + 3];
-      battery[1] = buf[index + 5];
-      index += 6;//Push index into next area to check if there's a UDP stream coming in
-    }
-    if(buf[index] = 'u' && buf[index + 1] == 's')//Starts with US, Send UDP data to specified port
-    {
-      index += 2;
-      char tempPort[10];
-      for(int i = 0; buf[++index] != ' '; i++)
-      {
-        tempPort[i] = buf[index];
-      }
-      int port = atoi(tempPort);
-      int dataSize = buf[++index];
-      byte sendDat[dataSize];
-      for(int i = 0; i < dataSize; i++)
-      {
-        sendDat[i] = buf[++index];
-      }
-      Udp.beginPacket(computer, port);
-      Udp.write(sendDat, dataSize);
-      Udp.endPacket();
+      pushByte(Serial.read());
     }
     timer = 0;
   }
-  lastLen = Serial.available();
+
+  while(txCnt > 0)
+  {
+    switch(currentState)
+    {
+      default:
+      {
+        currentState = header1;
+        break;
+      }
+        
+      //Header 1, find first byte of header
+      case header1:
+      {
+        h1 = popByte();
+        if(h1 == 0x33)
+          currentState = header2;
+        break;
+      }
+
+      //Header 2, find second byte of header and decide what state I will be in
+      case header2:
+      {
+        byte h2 = popByte();
+        currentState = lenAssign;
+        if( h2 == 'i')
+        {
+          payloadState = ipAssign;
+        }
+        else if(h2 == 'b')
+        {
+          payloadState = batAssign;
+        }
+        else if(h2 == 'u')
+        {
+          payloadState = udpSend;
+        }
+        else
+        {
+          currentState = header1;
+        }
+        break;
+      }
+        
+      //Length, find the length of the payload
+      case lenAssign:
+      {
+        len = popByte();
+        currentState = payload;
+        iterator = 0;
+        break;
+      }
+
+      //Payload, assign data to array for use later
+      case payload:
+      {
+        while(txCnt > 0 && iterator < len)
+        {
+          serialData[iterator++] = popByte();
+        }
+        if(iterator == len)
+          currentState = payloadState;
+        break;
+      }
+        
+      //IP Assign, assign an IP address
+      case ipAssign:
+      {
+        module[0] = serialData[0];
+        module[1] = serialData[1];
+        module[2] = serialData[2];
+        module[3] = serialData[3];
+        computer[0] = serialData[4];
+        computer[1] = serialData[5];
+        computer[2] = serialData[6];
+        computer[3] = serialData[7];
+        
+        f = SPIFFS.open("/config.txt", "w+");
+        f.write(serialData, 8);
+        f.close();
+        
+        WiFi.softAPConfig(module, computer, {255, 255, 255, 0});
+        currentState = header1;
+        break;
+      }
+
+      //Assign battery voltage
+      case batAssign:
+      {
+        battery[0] = serialData[0];
+        battery[1] = serialData[1];
+        currentState = header1;
+        break;
+      }
+
+      case udpSend:
+      {
+        uint16_t udpPort = ((uint16_t)serialData[1] << 8) + (serialData[0]);
+        byte dataSize = len - 2;
+        byte udpData[dataSize];
+        for(int i = 0; i < dataSize; i++)  udpData[i] = serialData[i+2];
+        Udp.beginPacket(computer, udpPort);
+        Udp.write(udpData, dataSize);
+        Udp.endPacket();
+        currentState = header1;
+        break;
+      }
+    }
+  }
 
 //Host Webpage///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   server.handleClient();

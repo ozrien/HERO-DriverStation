@@ -36,14 +36,14 @@ namespace CTRE.FRC
         bool _connected;//Connected to wifi module or not
         bool _updateFlag;//New data
         byte[] _sendingMessage;//Byte array to module
-        static byte len = 0;
-        static int iterator = 0;
-        static UInt16 eofA = 0;
-        static UInt16 checksum = 0;
+        static byte _len= 0;
+        static int _iterator = 0;
+        static UInt16 _eofA = 0;
+        static UInt16 _checksum = 0;
         static byte[] _tx = new byte[255];//Ring buffer
         static uint _txCnt = 0;//Ring buffer size
-        static uint _txIn = 0;//Ring buffer in iterator
-        static uint _txOut = 0;//Ring buffer out iterator
+        static uint _txIn = 0;//Ring buffer in _iterator
+        static uint _txOut = 0;//Ring buffer out _iterator
         /** Cache for reading out bytes in serial driver. */
         Stopwatch _timeout = new Stopwatch();
         Stopwatch _enableTimeout = new Stopwatch();
@@ -111,14 +111,14 @@ namespace CTRE.FRC
             _controllers = new CTRE.Controller.GameController[6];
             _data = new byte[255];
             _timeout.Start();
-            _sendingMessage = new byte[1] { 0x33 };
+            _sendingMessage = new byte[1] { 0x00 };
             _enableTimeout.Start();
             _initialization.Start();
         }
         
         public void update()
         {
-            _sendingMessage = combine(_sendingMessage, new byte[1] { 0x33 });
+            _sendingMessage = combine(new byte[1] { 0x00 }, _sendingMessage);
             _uart.Write(_sendingMessage, 0, _sendingMessage.Length);
             _sendingMessage = new byte[0];
             _updateFlag = false;
@@ -126,7 +126,6 @@ namespace CTRE.FRC
 
             if (_uart.BytesToRead > 0)
             {
-                _timeout.Start();
                 _updateFlag = true;
 
                 for(int i = 0; i < _uart.BytesToRead; i++)
@@ -136,65 +135,65 @@ namespace CTRE.FRC
             }
 
 
-            //Process data
-            if(_txCnt > 0)
+            //Process data until buffer is empty to ensure newest data
+            while (_txCnt > 0)
+            {
                 switch (processing)
                 {
+                    //Header frame, make sure I've got an AA
                     case Processing.header:
-                        checksum = 0;
+                        _checksum = 0;
                         if (PopByte() == 0xAA)
                         {
-                            checksum += 0xAA;
+                            _checksum += 0xAA;
                             processing = Processing.length;
-                            if (_txCnt > 0)
-                                goto case Processing.length;
                         }
                         break;
 
+                    //Length frame, find out how long the payload is
                     case Processing.length:
-                        len = PopByte();
-                        checksum += len;
-                        iterator = 0;
+                        _len = PopByte();
+                        _checksum += _len;
+                        _iterator = 0;
                         processing = Processing.payload;
-                        if (_txCnt > 0)
-                            goto case Processing.payload;
-                        else break;
+                        break;
 
+                    //Payload frame, assign payload to data array
                     case Processing.payload:
-                        while (_txCnt > 0 && iterator < len)
+                        while (_txCnt > 0 && _iterator < _len)
                         {
-                            _data[iterator] = PopByte();
-                            checksum += _data[iterator];
-                            iterator++;
+                            _data[_iterator] = PopByte();
+                            _checksum += _data[_iterator];
+                            _iterator++;
                         }
-                        if (iterator == len)
+                        if (_iterator == _len)
                         {
                             processing = Processing.eof1;
-                            if (_txCnt > 0) goto case Processing.eof1;
                         }
                         break;
 
+                    //End of frame 1, record first checksum byte
                     case Processing.eof1:
-                        eofA = PopByte();
+                        _eofA = PopByte();
                         processing = Processing.eof2;
-                        if (_txCnt > 0) goto case Processing.eof2;
                         break;
 
+                    //End of frame 2, record second checksum byte, combine two, and ensure it's 0
                     case Processing.eof2:
-                        checksum += (UInt16)((UInt16)(eofA << 8) + (UInt16)PopByte());
-                        if (checksum == 0x00)
+                        _checksum += (UInt16)((UInt16)(_eofA << 8) + (UInt16)PopByte());
+                        if (_checksum == 0x00)
                         {
                             processing = Processing.process;
                             goto case Processing.process;
                         }
                         else
                         {
-                            //Bad checksum
+                            //Bad _checksum
                             processing = Processing.header;
-                            if (_txCnt > 0) goto case Processing.header;
                         }
                         break;
-
+                    
+                    //Process frame, assign payload data to joysticks
                     case Processing.process:
 
                         int joystickIndex = 0;//Initialize gamepad index
@@ -212,7 +211,7 @@ namespace CTRE.FRC
                         int tempHat = 0xffff;
 
 
-                        while (len - index > 8 && joystickIndex < 6)//Check if there's gamepad data & make sure there isn't more than 6 joysticks
+                        while (_len - index > 8 && joystickIndex < 6)//Check if there's gamepad data & make sure there isn't more than 6 joysticks
                         {
                             if (_data[++index] == 0) break;
 
@@ -244,12 +243,15 @@ namespace CTRE.FRC
                             ++joystickIndex;
                         }
                         processing = Processing.header;
-                        if (_txCnt > 0) goto case Processing.header;
                         break;
-
+                    
+                    //If anything else, set to header
                     default:
+                        processing = Processing.header;
                         break;
                 }
+                _timeout.Start();
+            }
             
             if (_timeout.DurationMs > 5000)
             {
@@ -281,45 +283,36 @@ namespace CTRE.FRC
             {
                 CTRE.Watchdog.Feed();
             }
-            else
-            {
-                _enabled = false;
-            }
         }
         
         public void SendBattery(float voltage)
         {
-            if(_uart.CanWrite)
-            {
-                string s = voltage.ToString();
-                string[] p = s.Split('.');
-                byte p1 = (byte)(int)voltage;
-                voltage -= (float)(p1 + 0.005);
-                byte p2 = (byte)(int)((voltage / 10) * 255);
-                p1 = byte.Parse(p[0]);
-                p2 = (byte)((int.Parse(p[1]) / (float)1000) * 255);
-                _sendingMessage = combine(_sendingMessage, (new byte[] { (byte)'b', (byte)'a', (byte)' ', (byte)p1, (byte)' ', (byte)p2 }));
-            }
+            byte p1 = (byte)(int)voltage;
+            voltage -= (float)(p1 + 0.005);
+            byte p2 = (byte)(int)((voltage * 10) * 255);
+            _sendingMessage = combine(_sendingMessage, (new byte[] { 0x33, (byte)'b', 0x02, (byte)p1, (byte)p2 }));
         }
 
-        public void SendIP(string targetIP, string moduleIP)
+        public void SendIP(byte[] moduleIP, byte[] targetIP)
         {
-            if (_uart.CanWrite)
-            {
-                string content = "ip " + targetIP + " " + moduleIP;
-                byte[] b = System.Text.Encoding.UTF8.GetBytes(content);
-                _sendingMessage = combine(_sendingMessage, b);
-            }
+            _sendingMessage = combine(_sendingMessage, new byte[] { 0x33, (byte)'i', (byte)(moduleIP.Length + targetIP.Length) });
+            _sendingMessage = combine(_sendingMessage, moduleIP);
+            _sendingMessage = combine(_sendingMessage, targetIP);
         }
 
-        public void SendUDP(string port, byte[] data)
+        public void SendUDP(UInt16 port, byte[] data)
         {
-            if(_uart.CanWrite && data.Length < 150)
+            if(data.Length < 200)
             {
-                string beginning = "us " + port + " ";
-                byte[] b = System.Text.Encoding.UTF8.GetBytes(beginning);
+                _sendingMessage = combine(_sendingMessage, new byte[] { 0x33, (byte)'u', (byte)(data.Length + 2) });
+
+                byte[] b = BitConverter.GetBytes(port);
                 _sendingMessage = combine(_sendingMessage, b);
                 _sendingMessage = combine(_sendingMessage, data);
+            }
+            else
+            {
+                throw new Exception("Data length too long");
             }
         }
 

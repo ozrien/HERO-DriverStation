@@ -52,7 +52,7 @@ namespace HERO_DriverStationExample
             right1.SetControlMode(CTRE.TalonSrx.ControlMode.kPercentVbus);
 
             //Set IP module looks for and is configured with, Computer must set to Static IP
-            ds.SendIP("10 0 33 5", "10 0 33 2");
+            ds.SendIP(new byte[] { 10, 0, 33, 2 }, new byte[] { 10, 0, 33, 5 });
 
 
             while (true)
@@ -77,6 +77,7 @@ namespace HERO_DriverStationExample
                     //Teleop Code while enabled
                     Drive();
                     Debug.Print(stringBuilder.ToString());
+                    ds.SendUDP(2550,  Encoding.UTF8.GetBytes(stringBuilder.ToString()));
                     stringBuilder.Clear();
                 }
                 else if(!ds.IsAuton() && !ds.IsEnabled())
