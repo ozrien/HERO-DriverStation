@@ -47,6 +47,7 @@ For more information on flashing the HERO, go [here](http://www.ctr-electronics.
 * Multiple joysticks
 * Round trip time graph on Driver Station
 * Battery voltage can be sent to driver station
+* UDP use, set a port and send a byte array of data to be used for a custom dashboard
 
 <img src="Documentation/DriverStation.PNG" width = "900"/>
 
@@ -83,6 +84,12 @@ An example project is included that shows how to use the driver station class. T
 *Treat the controller as a normal controller*
 ```c#
   float y = _gamepad.getAxis(1);
+```
+*For added functionality use SendBattery, SendIP, and SendUDP methods*
+```c#
+  ds.SendIP(new byte[] { 10, 0, 33, 2 }, new byte[] { 10, 0, 33, 5 });
+  ds.SendBattery(12.34f);
+  ds.SendUDP(1234, BitConverter.UTF8.GetBytes("This is sent through UDP"));
 ```
 # Key notes in the Firmware
 The Module firmware currently hard codes the SSID and Password into the module. If you would like to change that, or do anything else with the firmware, you are free to. For SSID and Password it is inside the setup function under the function WiFi.softAP, use the search function to find it. In order to flash the module with the new firmware, follow these next few steps.
