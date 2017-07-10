@@ -124,17 +124,12 @@ namespace CTRE.FRC
             _updateFlag = false;
             _sendingMessage = new byte[1];
 
-            if (_uart.BytesToRead > 0)
+            while (_uart.BytesToRead > 0)
             {
                 _updateFlag = true;
-
-                for(int i = 0; i < _uart.BytesToRead; i++)
-                {
-                    PushByte((byte)_uart.ReadByte());
-                }
+                PushByte((byte)_uart.ReadByte());
             }
-
-
+            
             //Process data until buffer is empty to ensure newest data
             while (_txCnt > 0)
             {
@@ -200,10 +195,7 @@ namespace CTRE.FRC
                         int index = 5;//Initialize data index just before gamepad data
                         _currentState = (State)_data[3];
                         _enabled = (_currentState == State.autonEnabled || _currentState == State.teleopEnabled || _currentState == State.testEnabled);
-                        if (_enabled)
-                        {
-                            _enableTimeout.Start();
-                        }
+                        
                         //GamePad Data Parsing
 
                         float[] tempAxis = new float[6] { 0, 0, 0, 0, 0, 0 };
@@ -276,12 +268,19 @@ namespace CTRE.FRC
                 _connected = true;
             }
 
-            uint e = _enableTimeout.DurationMs;
-            _enabled = e < 100 && _initialization.DurationMs > 1000;
+            if(_timeout.DurationMs > 500)
+            {
+                _enabled = false;
+            }
+            
 
             if (_enabled)
             {
                 CTRE.Watchdog.Feed();
+            }
+            else
+            {
+                _enabled = false;
             }
         }
         

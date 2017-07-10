@@ -52,7 +52,6 @@ enum ProcessState
   lenAssign,
   payload,
   ipAssign,
-  batAssign,
   udpSend,
   portAssign
 };
@@ -152,8 +151,28 @@ void setup() {
 }
 
 void loop() {
-//Intake data from UDP stream, send back required data/////////////////////////////////////////////////////////////////////////////////////////////////
+//Intake data from UDP stream, send to HERO/////////////////////////////////////////////////////////////////////////////////////////////////
   uint8_t data[100];
+  int dSize = Udp.parsePacket();
+  if(dSize)
+  {
+    packetCounter++;
+    byte len = Udp.read(data, 100);
+    uint16_t checksum = 0xAA;
+    Serial.write(0xAA);
+    Serial.write(len);
+    checksum += len;
+    for(int i = 0; i < len; i++)
+    {
+      Serial.write(data[i]);
+      checksum += data[i];
+    }
+    checksum = 0 - checksum;
+    uint8_t c1 = checksum >> 8;
+    uint8_t c2 = checksum - (c1 << 8);
+    Serial.write(c1);
+    Serial.write(c2);
+  }
 
 //Read data from Serial bus and process it////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(Serial.available())
