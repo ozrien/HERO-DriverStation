@@ -92,7 +92,7 @@ An example project is included that shows how to use the driver station class. T
   ds.SendUDP(1234, BitConverter.UTF8.GetBytes("This is sent through UDP"));
 ```
 # Key notes in the Firmware
-The Module firmware currently hard codes the SSID and Password into the module. If you would like to change that, or do anything else with the firmware, you are free to. For SSID and Password it is inside the setup function under the function WiFi.softAP, use the search function to find it. In order to flash the module with the new firmware, follow these next few steps.
+The Module firmware currently hard codes the SSID and Password into the module. If you would like to change that, or do anything else with the firmware, you are free to. For SSID and Password it is inside the setup function under the function WiFi.softAP, use the search function to find it. To flash the module with the new firmware, follow these next few steps.
 1. Run the Binary Splitter project, and point to the bin file from the arduino compile
 2. Find the 11 bin files the project will spit out.
 3. Open the wifi esp flasher project
